@@ -5,7 +5,7 @@ import jwt
 import datetime
 import hashlib
 import json
-import utils
+import modules.utils as utils
 from functools import wraps
 
 app = Flask(__name__)
@@ -28,7 +28,7 @@ def token_required(f):
         token = request.headers.get('authorization')
 
         try:
-            jwt_data = jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
+            jwt.decode(token, app.config['SECRET_KEY'], algorithms=['HS256'])
         except:
             return utils.json_response(401, "Token Required!")
         
@@ -50,7 +50,14 @@ def login():
         return utils.json_response(401, 'Authentication failed')
 
     # CREATE JWT TOKEN
-    token = jwt.encode({ 'user_id': db_user['id'], 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=2) }, app.config['SECRET_KEY'])
+    token = jwt.encode(
+        {
+            'user_id' : db_user['id'],
+            'group_id' : 1,
+            'exp' : datetime.datetime.utcnow() + datetime.timedelta(hours=2)
+        },
+        app.config['SECRET_KEY']
+    )
 
     data = {
         'message' : 'Login Sucessful!',
@@ -71,13 +78,22 @@ def listCards():
 @token_required
 def addCards():
     cur = conn.cursor()
-    sql = "INSERT INTO cartoes (nome, limite, id_banco) VALUES (%)"
-    # cur.execute(sql, data)
-    # cardList = cur.fetchall()
-    # return json.dumps(dbDatatoDict(cur.description, cardList))
-    card = request.json
-    return "Hello"
+    insert_card_sql = "INSERT INTO cartoes (nome, limite, id_banco, id_grupo) VALUES (%s, %s, %s, %s)"
+    try:
+        card = request.json
+    except:
+        return utils.json_response(400, "Data missing!")
 
+    tokenData = utils.getTokenData(request, app.config['SECRET_KEY'])
+
+    try:
+        cur.execute(insert_card_sql, (card['nome'], card['limite'], card['id_banco'], tokenData['group_id']))
+        conn.commit()
+    except Exception as err:
+        print (err)
+        return utils.json_response(400, 'Something went wrong')
+
+    return utils.json_response(201, 'Card Created!')
 
 
 if __name__ == '__main__':
