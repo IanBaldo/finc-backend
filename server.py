@@ -1,4 +1,3 @@
-from ctypes import util
 from flask import Flask, request
 import psycopg2
 import jwt
@@ -65,7 +64,7 @@ def login():
     }
     return utils.json_response(200, 'Login OK!', data)
 
-###########  CARTÕES  ###########
+###########  CARDS  ###########
 @app.route('/cards/list')
 @token_required
 def listCards():
@@ -95,6 +94,47 @@ def addCards():
 
     return utils.json_response(201, 'Card Created!')
 
+###########  EXPENSES  ###########
+@app.route('/expenses/add', methods=['POST'])
+@token_required
+def addExpense():
+    try:
+        expense = request.json
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, "Data missing!")
+
+    columns = ['nome','valor','data','bol_recorrente','id_cartao']
+
+    if 'id_tag' in expense:
+        columns.append('id_tag')
+
+    insert_expense_sql = "INSERT INTO despesas (%s) VALUES (" % utils.a2s(columns)
+    for i in range(len(columns)):
+        insert_expense_sql += '%s,'
+
+    # Remove last ',' and add ')'
+    insert_expense_sql = insert_expense_sql[:len(insert_expense_sql)-1] + ')'
+
+    cur = conn.cursor()
+    for i in range(int(expense['parcelas'])):
+        # Add 1 month to each date (but the first)
+        # TODO: Find a better way to increase the month
+        dt = (datetime.datetime.utcnow() + datetime.timedelta(days=i*30)).strftime('%Y-%m-%d')
+        values = (expense['nome'], utils.value2db(expense['valor']), dt, expense['bol_recorrente'], expense['id_cartao'])
+        
+        # Improvement: Is there a way to test this only once? (line 110)
+        if 'id_tag' in expense:
+            values += (expense['id_tag'],)
+
+        try:
+            cur.execute(insert_expense_sql, values)
+        except Exception as e:
+            print(e)
+            return utils.json_response(400, 'Something went wrong')
+
+    conn.commit()
+    return utils.json_response(201, 'Expense Created!')
 
 if __name__ == '__main__':
     app.run(debug=True)

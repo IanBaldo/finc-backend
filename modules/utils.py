@@ -30,3 +30,13 @@ def dbDatatoDict(descriptions, db_data):
 def getTokenData(request, secret):
     token = request.headers.get('authorization')
     return jwt.decode(token, secret, algorithms=['HS256'])
+
+def value2db(value):
+    return str(int(float(value)*100))
+
+def db2value(db_value):
+    return float(format(int(db_value)/100, '.2f'))
+
+# Array to string
+def a2s(arr, sep=","):
+    return sep.join(arr)
