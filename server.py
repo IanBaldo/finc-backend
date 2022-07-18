@@ -43,7 +43,7 @@ def login():
     get_user_by_username_sql = "Select * from usuarios where nome = %s"
     cur = conn.cursor()
     cur.execute(get_user_by_username_sql, (postData['username'],))
-    db_user = utils.dbDatatoDict(cur.description, cur.fetchall())
+    db_user = utils.db_data_2_dict(cur.description, cur.fetchall())
     pw_hash = hashlib.sha256(postData['password'].encode(encoding = 'UTF-8', errors = 'strict'))
     if db_user['senha'] != pw_hash.hexdigest():
         return utils.json_response(401, 'Authentication failed')
@@ -70,8 +70,9 @@ def login():
 def listCards():
     cur = conn.cursor()
     cur.execute("select * from cartoes")
+    
     cardList = cur.fetchall()
-    return utils.json_response(200, "Success", utils.dbDatatoDict(cur.description, cardList))
+    return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, cardList))
 
 @app.route('/cards/add', methods=['POST'])
 @token_required
@@ -83,7 +84,7 @@ def addCards():
     except:
         return utils.json_response(400, "Data missing!")
 
-    tokenData = utils.getTokenData(request, app.config['SECRET_KEY'])
+    tokenData = utils.get_token_data(request, app.config['SECRET_KEY'])
 
     try:
         cur.execute(insert_card_sql, (card['nome'], card['limite'], card['id_banco'], tokenData['group_id']))
@@ -119,8 +120,7 @@ def addExpense():
     cur = conn.cursor()
     for i in range(int(expense['parcelas'])):
         # Add 1 month to each date (but the first)
-        # TODO: Find a better way to increase the month
-        dt = (datetime.datetime.utcnow() + datetime.timedelta(days=i*30)).strftime('%Y-%m-%d')
+        dt = utils.dt_add_n_months(datetime.datetime.now(), i).strftime('%Y-%m-%d')
         values = (expense['nome'], utils.value2db(expense['valor']), dt, expense['bol_recorrente'], expense['id_cartao'])
         
         # Improvement: Is there a way to test this only once? (line 110)
