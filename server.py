@@ -69,7 +69,24 @@ def login():
 @token_required
 def listCards():
     cur = conn.cursor()
-    cur.execute("select * from cartoes")
+    cur.execute("""
+    SELECT 
+        c.nome as card,
+        c.limite::float/100 as limit,
+        b.nome as bank,
+        sum(d.valor)::float/100 as bill 
+    FROM
+        cartoes c 
+        JOIN bancos b on c.id_banco = b.id
+        JOIN despesas d on c.id = d.id_cartao 
+    WHERE
+        d."data" between %s and %s
+    GROUP BY
+        c.nome,
+        c.limite,
+        b.nome""", 
+        utils.month_range(datetime.datetime.now().strftime('%m'))
+    )
     
     cardList = cur.fetchall()
     return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, cardList))
