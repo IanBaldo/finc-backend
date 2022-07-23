@@ -48,6 +48,7 @@ def get_last_date_of_month(month):
     return (datetime.date(year, month+1, 1) - datetime.timedelta(days=1)).strftime('%Y-%m-%d')
 
 def month_range(month):
+    month = int(month)
     year = int(datetime.datetime.now().strftime('%Y'))
     first_day = datetime.date(year, month, 1).strftime('%Y-%m-%d')
     last_day = get_last_date_of_month(month)
