@@ -84,6 +84,8 @@ def listCards():
                 "date" between %s and %s
                 AND
                 id_card is NOT NULL
+                AND
+                dt_deleted is NULL
         ) as e
             on c.id = e.id_card 
     GROUP BY
@@ -120,7 +122,7 @@ def addCards():
 ###########  EXPENSES  ###########
 @app.route('/expenses/card/add', methods=['POST'])
 @token_required
-def addExpense():
+def addCardExpense():
     try:
         expense = request.json
     except Exception as e:
@@ -142,7 +144,7 @@ def addExpense():
     tokenData = utils.get_token_data(request, app.config['SECRET_KEY'])
 
     cur = conn.cursor()
-    card_installments = int(expense['installments']) or 1
+    card_installments = int(expense['installments'])
     for month_delta in range(card_installments):
         # Add 1 month to each date (but the first)
         dt = utils.dt_add_n_months(datetime.datetime.now(), month_delta).strftime('%Y-%m-%d')
@@ -165,6 +167,60 @@ def addExpense():
 
     conn.commit()
     return utils.json_response(201, 'Expense Created!')
+
+@app.route('/expenses/fixed/add', methods=['POST'])
+@token_required
+def addFixedExpense():
+    try:
+        expense = request.json
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, "Data missing!")
+
+    tokenData = utils.get_token_data(request, app.config['SECRET_KEY'])
+    insert_fixed_expense_sql = "INSERT INTO expenses (name,value,is_recurrent,id_user) VALUES (%s,%s,%s,%s)"
+    values = (expense['name'], utils.value2db(expense['value']), expense['is_recurrent'], tokenData['user_id'])
+
+    cur = conn.cursor()
+    try:
+        cur.execute(insert_fixed_expense_sql, values)
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, 'Something went wrong')
+    
+    conn.commit()
+    return utils.json_response(201, 'Expense Created!')
+
+@app.route('/expenses/fixed')
+@token_required
+def listFixedExpense():
+
+    tokenData = utils.get_token_data(request, app.config['SECRET_KEY'])
+    list_fixed_expenses_sql = """
+    SELECT
+        id,
+        name,
+        date,
+        value::float/100 as value,
+        dt_created
+    FROM expenses
+    WHERE
+        is_recurrent = true
+        AND
+        id_card is NULL
+        AND
+        dt_deleted is NULL
+        AND id_user = %s"""
+
+    cur = conn.cursor()
+    try:
+        cur.execute(list_fixed_expenses_sql, (tokenData['user_id'],))
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, 'Something went wrong')
+    
+    fixedExpensesList = cur.fetchall()
+    return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, fixedExpensesList))
 
 if __name__ == '__main__':
     app.run(debug=True)
