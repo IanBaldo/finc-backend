@@ -40,19 +40,18 @@ def token_required(f):
 @app.route('/login', methods=['POST'])
 def login():
     postData = request.json
-    get_user_by_username_sql = "Select * from usuarios where nome = %s"
+    get_user_by_username_sql = "Select * from users where name = %s"
     cur = conn.cursor()
     cur.execute(get_user_by_username_sql, (postData['username'],))
     db_user = utils.db_data_2_dict(cur.description, cur.fetchall())
     pw_hash = hashlib.sha256(postData['password'].encode(encoding = 'UTF-8', errors = 'strict'))
-    if db_user['senha'] != pw_hash.hexdigest():
+    if db_user['pass'] != pw_hash.hexdigest():
         return utils.json_response(401, 'Authentication failed')
 
     # CREATE JWT TOKEN
     token = jwt.encode(
         {
             'user_id' : db_user['id'],
-            'group_id' : 1,
             'exp' : datetime.datetime.utcnow() + datetime.timedelta(hours=2)
         },
         app.config['SECRET_KEY']
@@ -71,20 +70,26 @@ def listCards():
     cur = conn.cursor()
     cur.execute("""
     SELECT 
-        c.nome as card,
-        c.limite::float/100 as limit,
-        b.nome as bank,
-        sum(d.valor)::float/100 as bill 
+        c.name as card,
+        c.credit_limit::float/100 as limit,
+        b.name as bank,
+        coalesce(sum(e.value)::float/100,0) as bill 
     FROM
-        cartoes c 
-        JOIN bancos b on c.id_banco = b.id
-        JOIN despesas d on c.id = d.id_cartao 
-    WHERE
-        d."data" between %s and %s
+        cards c 
+        JOIN banks b on c.id_bank = b.id
+        LEFT JOIN (
+            SELECT id, id_card, value
+            FROM expenses  
+            WHERE
+                "date" between %s and %s
+                AND
+                id_card is NOT NULL
+        ) as e
+            on c.id = e.id_card 
     GROUP BY
-        c.nome,
-        c.limite,
-        b.nome""", 
+        c.name,
+        c.credit_limit,
+        b.name""", 
         utils.month_range(datetime.datetime.now().strftime('%m'))
     )
     
@@ -95,7 +100,7 @@ def listCards():
 @token_required
 def addCards():
     cur = conn.cursor()
-    insert_card_sql = "INSERT INTO cartoes (nome, limite, id_banco, id_grupo) VALUES (%s, %s, %s, %s)"
+    insert_card_sql = "INSERT INTO cards (name, credit_limit, id_bank, id_user) VALUES (%s, %s, %s, %s)"
     try:
         card = request.json
     except:
@@ -104,7 +109,7 @@ def addCards():
     tokenData = utils.get_token_data(request, app.config['SECRET_KEY'])
 
     try:
-        cur.execute(insert_card_sql, (card['nome'], card['limite'], card['id_banco'], tokenData['group_id']))
+        cur.execute(insert_card_sql, (card['name'], card['credit_limit'], card['id_bank'], tokenData['user_id']))
         conn.commit()
     except Exception as err:
         print (err)
@@ -122,23 +127,31 @@ def addExpense():
         print(e)
         return utils.json_response(400, "Data missing!")
 
-    columns = ['nome','valor','data','bol_recorrente','id_cartao']
+    columns = ['name','value','date','is_recurrent','id_card','id_user']
 
     if 'id_tag' in expense:
         columns.append('id_tag')
 
-    insert_expense_sql = "INSERT INTO despesas (%s) VALUES (" % utils.a2s(columns)
+    insert_expense_sql = "INSERT INTO expenses (%s) VALUES (" % utils.a2s(columns)
     for i in range(len(columns)):
         insert_expense_sql += '%s,'
 
     # Remove last ',' and add ')'
     insert_expense_sql = insert_expense_sql[:len(insert_expense_sql)-1] + ')'
 
+    tokenData = utils.get_token_data(request, app.config['SECRET_KEY'])
+
     cur = conn.cursor()
-    for i in range(int(expense['parcelas'])):
+    card_installments = int(expense['installments']) or 1
+    for i in range(card_installments):
         # Add 1 month to each date (but the first)
         dt = utils.dt_add_n_months(datetime.datetime.now(), i).strftime('%Y-%m-%d')
-        values = (expense['nome'], utils.value2db(expense['valor']), dt, expense['bol_recorrente'], expense['id_cartao'])
+
+        name = expense['name']
+        if card_installments > 1:
+            name = name + (" %s/%s" % (i+1,card_installments))
+
+        values = (name, utils.value2db(expense['value']), dt, expense['is_recurrent'], expense['id_card'], tokenData['user_id'])
         
         # Improvement: Is there a way to test this only once? (line 110)
         if 'id_tag' in expense:
