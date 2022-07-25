@@ -118,7 +118,7 @@ def addCards():
     return utils.json_response(201, 'Card Created!')
 
 ###########  EXPENSES  ###########
-@app.route('/expenses/add', methods=['POST'])
+@app.route('/expenses/card/add', methods=['POST'])
 @token_required
 def addExpense():
     try:
@@ -143,13 +143,13 @@ def addExpense():
 
     cur = conn.cursor()
     card_installments = int(expense['installments']) or 1
-    for i in range(card_installments):
+    for month_delta in range(card_installments):
         # Add 1 month to each date (but the first)
-        dt = utils.dt_add_n_months(datetime.datetime.now(), i).strftime('%Y-%m-%d')
+        dt = utils.dt_add_n_months(datetime.datetime.now(), month_delta).strftime('%Y-%m-%d')
 
         name = expense['name']
         if card_installments > 1:
-            name = name + (" %s/%s" % (i+1,card_installments))
+            name = name + (" %s/%s" % (month_delta+1,card_installments))
 
         values = (name, utils.value2db(expense['value']), dt, expense['is_recurrent'], expense['id_card'], tokenData['user_id'])
         
