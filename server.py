@@ -39,12 +39,12 @@ def token_required(f):
 ### LOGIN
 @app.route('/login', methods=['POST'])
 def login():
-    postData = request.json
+    post_data = request.json
     get_user_by_username_sql = "Select * from users where name = %s"
     cur = conn.cursor()
-    cur.execute(get_user_by_username_sql, (postData['username'],))
+    cur.execute(get_user_by_username_sql, (post_data['username'],))
     db_user = utils.db_data_2_dict(cur.description, cur.fetchall())
-    pw_hash = hashlib.sha256(postData['password'].encode(encoding = 'UTF-8', errors = 'strict'))
+    pw_hash = hashlib.sha256(post_data['password'].encode(encoding = 'UTF-8', errors = 'strict'))
     if db_user['pass'] != pw_hash.hexdigest():
         return utils.json_response(401, 'Authentication failed')
 
@@ -95,8 +95,8 @@ def listCards():
         utils.month_range(datetime.datetime.now().strftime('%m'))
     )
     
-    cardList = cur.fetchall()
-    return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, cardList))
+    card_list = cur.fetchall()
+    return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, card_list))
 
 @app.route('/cards/add', methods=['POST'])
 @token_required
@@ -108,16 +108,47 @@ def addCards():
     except:
         return utils.json_response(400, "Data missing!")
 
-    tokenData = utils.get_token_data(request, app.config['SECRET_KEY'])
+    token_data = utils.get_token_data(request, app.config['SECRET_KEY'])
 
     try:
-        cur.execute(insert_card_sql, (card['name'], card['credit_limit'], card['id_bank'], tokenData['user_id']))
+        cur.execute(insert_card_sql, (card['name'], card['credit_limit'], card['id_bank'], token_data['user_id']))
         conn.commit()
     except Exception as err:
         print (err)
         return utils.json_response(400, 'Something went wrong')
 
     return utils.json_response(201, 'Card Created!')
+
+@app.route('/cards/details/<card_id>')
+@token_required
+def cardDetails(card_id):
+    cur = conn.cursor()
+    card_details_sql = """
+    SELECT
+        id,
+        name,
+        value::float/100 as value,
+        date
+    FROM expenses
+    WHERE
+        id_card = %s
+        AND
+        dt_deleted is NULL
+        AND
+        date >= %s
+        AND
+        id_user = %s"""
+
+    token_data = utils.get_token_data(request, app.config['SECRET_KEY'])
+    first_day_of_current_month = utils.month_range(datetime.datetime.now().strftime('%m'))[0]
+    try:
+        cur.execute(card_details_sql, (card_id, first_day_of_current_month, token_data['user_id']))
+    except Exception as err:
+        print (err)
+        return utils.json_response(400, 'Something went wrong')
+
+    card_details = cur.fetchall()
+    return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, card_details))
 
 ###########  EXPENSES  ###########
 @app.route('/expenses/card/add', methods=['POST'])
@@ -141,7 +172,7 @@ def addCardExpense():
     # Remove last ',' and add ')'
     insert_expense_sql = insert_expense_sql[:len(insert_expense_sql)-1] + ')'
 
-    tokenData = utils.get_token_data(request, app.config['SECRET_KEY'])
+    token_data = utils.get_token_data(request, app.config['SECRET_KEY'])
 
     cur = conn.cursor()
     card_installments = int(expense['installments'])
@@ -153,7 +184,7 @@ def addCardExpense():
         if card_installments > 1:
             name = name + (" %s/%s" % (month_delta+1,card_installments))
 
-        values = (name, utils.value2db(expense['value']), dt, expense['is_recurrent'], expense['id_card'], tokenData['user_id'])
+        values = (name, utils.value2db(expense['value']), dt, expense['is_recurrent'], expense['id_card'], token_data['user_id'])
         
         # Improvement: Is there a way to test this only once? (line 110)
         if 'id_tag' in expense:
@@ -177,9 +208,9 @@ def addFixedExpense():
         print(e)
         return utils.json_response(400, "Data missing!")
 
-    tokenData = utils.get_token_data(request, app.config['SECRET_KEY'])
+    token_data = utils.get_token_data(request, app.config['SECRET_KEY'])
     insert_fixed_expense_sql = "INSERT INTO expenses (name,value,is_recurrent,id_user) VALUES (%s,%s,%s,%s)"
-    values = (expense['name'], utils.value2db(expense['value']), expense['is_recurrent'], tokenData['user_id'])
+    values = (expense['name'], utils.value2db(expense['value']), expense['is_recurrent'], token_data['user_id'])
 
     cur = conn.cursor()
     try:
@@ -195,7 +226,7 @@ def addFixedExpense():
 @token_required
 def listFixedExpense():
 
-    tokenData = utils.get_token_data(request, app.config['SECRET_KEY'])
+    token_data = utils.get_token_data(request, app.config['SECRET_KEY'])
     list_fixed_expenses_sql = """
     SELECT
         id,
@@ -214,7 +245,7 @@ def listFixedExpense():
 
     cur = conn.cursor()
     try:
-        cur.execute(list_fixed_expenses_sql, (tokenData['user_id'],))
+        cur.execute(list_fixed_expenses_sql, (token_data['user_id'],))
     except Exception as e:
         print(e)
         return utils.json_response(400, 'Something went wrong')
