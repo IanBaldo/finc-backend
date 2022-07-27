@@ -150,6 +150,32 @@ def cardDetails(card_id):
     card_details = cur.fetchall()
     return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, card_details))
 
+@app.route('/cards/bill/<card_id>', methods=['PUT'])
+@token_required
+def cardBillUpdate(card_id):
+    try:
+        bill_update = request.json
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, "Data missing!")
+
+    # The best way to update the card bill is to insert a new expense with the difference from the old bill
+    # This way we will have the desired effect and also a traceable expense to when it was changed
+    insert_diff_expense_sql = "INSERT INTO expenses (name,value,id_card,id_user) VALUES (%s,%s,%s,%s)"
+    diff_expense_value = utils.value2db(bill_update['new_bill'] - bill_update['old_bill'])
+    
+    token_data = utils.get_token_data(request, app.config['SECRET_KEY'])
+
+    cur = conn.cursor()
+    try:
+        cur.execute(insert_diff_expense_sql, ('Bill Update', diff_expense_value,card_id, token_data['user_id']))
+    except Exception as err:
+        print (err)
+        return utils.json_response(400, 'Something went wrong')
+    
+    conn.commit()
+    return utils.json_response(201, 'Bill Updated Successfuly')
+
 ###########  EXPENSES  ###########
 @app.route('/expenses/card/add', methods=['POST'])
 @token_required
@@ -250,8 +276,97 @@ def listFixedExpense():
         print(e)
         return utils.json_response(400, 'Something went wrong')
     
-    fixedExpensesList = cur.fetchall()
-    return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, fixedExpensesList))
+    fixed_expenses_list = cur.fetchall()
+    return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, fixed_expenses_list))
+
+###########  MONTH REPORT  ###########
+@app.route('/report/month/<month_number>')
+@token_required
+def getMonthReport(month_number):
+    report = {}
+    # List All Income for the month
+    get_month_income_sql = """
+        SELECT
+            name,
+            value,
+            date
+        FROM
+            incomes
+        WHERE
+            (date BETWEEN %s AND %s
+            OR
+            is_recurrent = true)
+            AND
+            dt_deleted is NULL
+            AND
+            id_user = %s"""
+
+    token_data = utils.get_token_data(request, app.config['SECRET_KEY'])
+    cur = conn.cursor()
+    try:
+        cur.execute(get_month_income_sql, (utils.month_range(month_number) + (token_data['user_id'],)))
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, 'Something went wrong')
+    
+    month_income = cur.fetchall()
+    report['income'] = utils.db_data_2_dict(cur.description, month_income)
+
+    # List All Cards Bills for the month
+    get_cards_bills_sql = """
+    SELECT
+        c.name,
+        coalesce(sum(e.value)::float/100, 0) as bill
+    FROM
+        cards c
+        LEFT JOIN expenses e ON c.id = e.id_card
+    WHERE
+        (e.date BETWEEN %s AND %s
+        OR
+        e.date is NULL)
+        AND
+        e.dt_deleted is NULL
+        AND
+        c.id_user = %s
+    GROUP BY
+        c.name"""
+    # 'date is NULL' is to include the cards without expenses for the month in the result
+
+    try:
+        cur.execute(get_cards_bills_sql, (utils.month_range(month_number) + (token_data['user_id'],)))
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, 'Something went wrong')
+    
+    cards_bills = cur.fetchall()
+    report['cards_bills'] = utils.db_data_2_dict(cur.description, cards_bills)
+
+    # List All Fixed Expenses for the month
+    get_fixed_expenses_sql = """
+    SELECT
+        name,
+        value::float/100 as value
+    FROM
+        expenses e
+    WHERE
+        id_card is NULL
+        AND
+        is_recurrent = true
+        AND 
+        dt_deleted is NULL
+        AND
+        id_user = %s"""
+    
+    try:
+        cur.execute(get_fixed_expenses_sql, (token_data['user_id'],))
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, 'Something went wrong')
+    
+    fixed_expenses = cur.fetchall()
+    report['fixed_expenses'] = utils.db_data_2_dict(cur.description, fixed_expenses)
+
+    return utils.json_response(200, 'Report Data OK!', report)
 
 if __name__ == '__main__':
     app.run(debug=True)
