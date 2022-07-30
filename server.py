@@ -122,6 +122,7 @@ def addCards():
 @app.route('/cards/details/<card_id>')
 @token_required
 def cardDetails(card_id):
+    # TODO better parsing and organization of the data to make it easier to work with and present
     cur = conn.cursor()
     card_details_sql = """
     SELECT
@@ -278,6 +279,19 @@ def listFixedExpense():
     
     fixed_expenses_list = cur.fetchall()
     return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, fixed_expenses_list))
+
+@app.route('/expenses/fixed/<expense_id>', methods=['DELETE'])
+@token_required
+def deleteFixedExpense(expense_id):
+    delete_fixed_expense_sql = "DELETE FROM expense WHERE id=%s"
+    cur = conn.cursor()
+    try:
+        cur.execute(delete_fixed_expense_sql, (expense_id,))
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, 'Something went wrong')
+
+    return utils.json_response(201, "Removed Successfully")
 
 ###########  MONTH REPORT  ###########
 @app.route('/report/month/<month_number>')
