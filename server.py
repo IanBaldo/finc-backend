@@ -291,6 +291,101 @@ def deleteFixedExpense(expense_id):
         print(e)
         return utils.json_response(400, 'Something went wrong')
 
+    conn.commit()
+    return utils.json_response(201, "Removed Successfully")
+
+###########  INCOME  ###########
+@app.route('/income/add', methods=['POST'])
+@token_required
+def addIncome():
+    try:
+        income = request.json
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, "Data missing!")
+
+    add_income_sql = "INSERT INTO incomes (name,value,is_recurrent,date,id_user) VALUES (%s,%s,%s,%s,%s)"
+    token_data = utils.get_token_data(request, app.config['SECRET_KEY'])
+    cur = conn.cursor()
+    try:
+        cur.execute(add_income_sql, (income['name'],utils.value2db(income['value']),income['is_recurrent'],income['date'],token_data['user_id']))
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, 'Something went wrong')
+
+    return utils.json_response(201, 'Income Added!')
+
+@app.route('/income/list')
+@token_required
+def listIncome():
+    list_incomes_sql = """
+    SELECT
+        id,
+        name,
+        value,
+        date
+    FROM
+        incomes
+    WHERE
+        dt_deleted is NULL
+        AND
+        id_user = %s"""
+
+    token_data = utils.get_token_data(request, app.config['SECRET_KEY'])
+    cur = conn.cursor()
+    try:
+        cur.execute(list_incomes_sql, (token_data['user_id'],))
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, 'Something went wrong')
+
+    income_list = cur.fetchall()
+    return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, income_list))
+
+@app.route('/income/list/month/<month>')
+@token_required
+def listMonthIncome(month):
+    list_incomes_sql = """
+    SELECT
+        id,
+        name,
+        value,
+        date
+    FROM
+        incomes
+    WHERE
+        ( date BETWEEN %s AND %s
+        OR
+        is_recurrent = true )
+        AND
+        dt_deleted is NULL
+        AND
+        id_user = %s"""
+
+    token_data = utils.get_token_data(request, app.config['SECRET_KEY'])
+    cur = conn.cursor()
+    try:
+        cur.execute(list_incomes_sql, utils.month_range(month) + (token_data['user_id'],))
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, 'Something went wrong')
+
+    income_list = cur.fetchall()
+    return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, income_list))
+
+@app.route('/income/remove/<income_id>', methods=['DELETE'])
+@token_required
+def removeIncome(income_id):
+    
+    delete_income_sql = "DELETE FORM incomes WHERE id=%s"
+    cur = conn.cursor()
+    try:
+        cur.execute(delete_income_sql, (income_id,))
+    except Exception as e:
+        print(e)
+        return utils.json_response(400, 'Something went wrong')
+
+    conn.commit()
     return utils.json_response(201, "Removed Successfully")
 
 ###########  MONTH REPORT  ###########
