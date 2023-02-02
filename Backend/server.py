@@ -21,6 +21,20 @@ conn = psycopg2.connect(
     config['db']['password'])
 )
 
+@app.after_request
+def after_request(response):
+    response.headers.add("Access-Control-Allow-Origin", "http://localhost:8100")
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+    response.headers['Access-Control-Allow-Methods'] = 'PUT,GET,POST,DELETE'
+    return response
+# def after_request(response):
+#     white_origin= ['http://localhost']
+#     if request.headers['Origin'] in white_origin:
+#         response.headers['Access-Control-Allow-Origin'] = request.headers['Origin'] 
+#         response.headers['Access-Control-Allow-Methods'] = 'PUT,GET,POST,DELETE'
+#         response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
+#     return response
+
 def token_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
