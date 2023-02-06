@@ -1,0 +1,8 @@
+Backend/venv/
+Backend/__pycache__
+Backend/modules/__pycache__
+Backend/config.json
+Backend/db.sql
+
+Frontend/node_modules/
+Frontend/package-lock.json
