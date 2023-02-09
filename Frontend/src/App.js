@@ -2,9 +2,9 @@ import React from 'react';
 import { Outlet } from "react-router-dom";
 
 import MainTabs from './components/MainTabs.jsx';
+import 'bulma/css/bulma.min.css';
 
-class App extends React.Component {
- render() {
+function App() {
   return(
    <>
     <Outlet />
@@ -12,5 +12,5 @@ class App extends React.Component {
    </>
   );
  }
-}
+
 export default App
