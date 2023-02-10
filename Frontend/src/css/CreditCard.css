@@ -1,0 +1,13 @@
+.bank-name {
+    font-style: italic;
+}
+
+.value {
+    font-size: 1.5em;
+    font-weight: 400;
+}
+
+.button-group {
+    display: flex;
+    justify-content: space-between;
+}

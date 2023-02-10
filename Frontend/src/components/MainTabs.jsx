@@ -3,38 +3,47 @@ import { useNavigate } from "react-router-dom";
 
 import './../css/MainTabs.css';
 
+const Tabs = [
+    {
+        title: "Fixas",
+        link: "fix"
+    },
+    {
+        title: "Cartões",
+        link: "cards"
+    },
+    {
+        title: "Renda",
+        link: "income"
+    },
+    {
+        title: "Status",
+        link: "status"
+    }
+]
 
 function MainTabs() {
     const navigate = useNavigate();
+    const [ activeTab, setActiveTab ] = useState('fix')
     
-    const handleClick = (route) => {
-        return navigate(`/${route}`)
+    function handleClick (tabLink) {
+        setActiveTab(tabLink)
+        return navigate(`/${tabLink}`)
     }
 
     return (
         <>
             <div className="tabs is-toggle is-fullwidth">
                 <ul>
-                    <li className="is-active" onClick={() => handleClick('fix')}>
-                        <a>
-                            <span>Fixas</span>
-                        </a>
-                    </li>
-                    <li onClick={() => handleClick('cards')}>
-                        <a>
-                            <span>Cartões</span>
-                        </a>
-                    </li>
-                    <li onClick={() => handleClick('income')}>
-                        <a>
-                            <span>Renda</span>
-                        </a>
-                    </li>
-                    <li onClick={() => handleClick('status')}>
-                        <a>
-                            <span>Status</span>
-                        </a>
-                    </li>
+                    {Tabs.map((tab, index) => {
+                        return (
+                            <li key={index} className={`${activeTab == tab.link ? "is-active" : ""}`} onClick={() => handleClick(tab.link)}>
+                                <a>
+                                    <span>{tab.title}</span>
+                                </a>
+                            </li>
+                        )
+                    })}
                 </ul>
             </div>
         </>
