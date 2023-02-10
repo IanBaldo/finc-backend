@@ -1,0 +1,19 @@
+.item {
+    display: flex;
+    padding-top: 0.5em;
+    max-width: 200px;
+}
+
+.item .item-title {
+    width: 40%;
+}
+
+.item .item-value {
+    width: 40%;
+    text-align: right;
+}
+
+.item .item-extra {
+    width: 20%;
+    text-align: right;
+}

@@ -23,6 +23,9 @@ function Header (props) {
                         {props.title}
                     </div>
                     <div className="navbar-end">
+                        <div className="buttons">
+                            {props.endBtn ? props.endBtn : ""}
+                        </div>
                     </div>
                 </div>
             </nav>

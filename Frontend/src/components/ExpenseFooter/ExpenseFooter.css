@@ -1,0 +1,16 @@
+.list-footer {
+    padding-top: 0.5em;
+    display: flex;
+    font-size: 1.3em;
+    font-weight: 700;
+    max-width: 200px;
+}
+
+.list-footer .header {
+    width: 40%;
+}
+
+.list-footer .total-value {
+    width: 40%;
+    text-align: right;
+}

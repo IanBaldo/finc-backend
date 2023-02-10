@@ -2,7 +2,7 @@ import React from 'react'
 import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
 
-import FixPage from "./pages/FixPage.jsx"
+import FixedExpensesPage from "./pages/FixedExpensesPage.jsx"
 import CardsPage from './pages/CardsPage.jsx';
 import IncomePage from './pages/IncomePage.jsx';
 import StatusPage from './pages/StatusPage.jsx';
@@ -14,7 +14,7 @@ const router = createBrowserRouter([
     children: [
       {
         path: "fix",
-        element: <FixPage />,
+        element: <FixedExpensesPage />,
       },
       {
         path: "cards",

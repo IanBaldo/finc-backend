@@ -9,7 +9,7 @@ function CardList(props) {
             {props.cards.map((card, index) => {
                 return (
                     <Card key={index}>
-                        <CreditCard key={index} cardName={card.cardName} value={card.value} />
+                        <CreditCard key={index} cardName={card.card} value={card.bill} />
                     </Card>
                 )
             })}

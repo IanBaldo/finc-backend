@@ -6,21 +6,30 @@ import Header from './../components/Header/Header.jsx';
 function CardsPage() {
     const cards = [
         {
-            cardName : 'Card 1',
-            value : '2000,00'
+            bank: "Bank 1",
+            bill: 1000.0,
+            card: "Card 1",
+            limit: 3000.0
         },
         {
-            cardName : 'Card 2',
-            value : '200,00'
+            bank: "Bank 1",
+            bill: 200.0,
+            card: "Card 2",
+            limit: 500.0
         },
         {
-            cardName : 'Card 3',
-            value : '1000,00'
+            bank: "Bank 2",
+            bill: 1300.0,
+            card: "Card 3",
+            limit: 700.0
         },
         {
-            cardName : 'Card 4',
-            value : '3000,00'
-        }
+            bank: "Bank 3",
+            bill: 400.0,
+            card: "Card 4",
+            limit: 2000.0
+        },
+        
     ]
     
     return(
