@@ -1,38 +1,35 @@
 import React from "react";
 
-import Card from './../components/Card.jsx';
-import CreditCard from './../components/CreditCard.jsx';
+import CardList from '../components/CardList/CardList.jsx';
+import Header from './../components/Header/Header.jsx';
 
 function CardsPage() {
     const cards = [
         {
-            cardName : 'Bradesco 1',
+            cardName : 'Card 1',
             value : '2000,00'
         },
         {
-            cardName : 'Nubank Day',
+            cardName : 'Card 2',
             value : '200,00'
         },
         {
-            cardName : 'Nubank Ian',
+            cardName : 'Card 3',
             value : '1000,00'
         },
         {
-            cardName : 'Santander',
+            cardName : 'Card 4',
             value : '3000,00'
         }
     ]
     
     return(
-        <div>
-            {cards.map((card, index) => {
-                return (
-                    <Card>
-                        <CreditCard key={index} cardName={card.cardName} value={card.value} />
-                    </Card>
-                )
-            })}
-        </div>
+        <>
+            <Header title="Cartões"/>
+            <div>
+                <CardList cards={cards} />
+            </div>
+        </>
     );
 }
 export default CardsPage;

@@ -1,10 +1,15 @@
 import React from "react";
 
+import Header from './../components/Header/Header.jsx';
+
 function IncomePage() {
     return(
-        <div>
-            Income Page
-        </div>
+        <>
+            <Header title="Renda"/>
+            <div>
+                Income Page
+            </div>
+        </>
     );
 }
 export default IncomePage;

@@ -1,6 +1,6 @@
 import React from "react";
 
-import './../css/CreditCard.css'
+import './CreditCard.css'
 
 function CreditCard(props) {
     return (
