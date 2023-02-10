@@ -1,6 +1,7 @@
 import React from "react";
 
 import Header from './../components/Header/Header.jsx';
+import ExpenseList from '../components/ExpenseList/ExpenseList.jsx'
 
 function IncomePage() {
 
@@ -19,12 +20,16 @@ function IncomePage() {
         }
 
     ]
+
+    function removeIncome(id) {
+        alert(`remove income: ${id}`)
+    }
     
     return(
         <>
             <Header title="Renda"/>
             <div>
-                Income Page
+                <ExpenseList title="Renda" items={incomeList} removable={true} callback={removeIncome} />
             </div>
         </>
     );
