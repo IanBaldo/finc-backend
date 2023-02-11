@@ -1,6 +1,10 @@
 import React from "react";
 
-import Header from './../components/Header/Header.jsx';
+import Header from "../../components/Header/Header.jsx";
+import StatusCard from "../../components/StatusCard/StatusCard.jsx";
+import PageContent from "../../components/PageContent/PageContent.jsx";
+
+import './StatusPage.css';
 
 function StatusPage() {
 
@@ -36,9 +40,12 @@ function StatusPage() {
     return(
         <>
             <Header title="Status"/>
-            <div>
-                Status Page
-            </div>
+            <PageContent>
+                <div className="status-title">
+                    Mês Atual
+                </div>
+                <StatusCard />
+            </PageContent>
         </>
     );
 }

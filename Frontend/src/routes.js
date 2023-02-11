@@ -2,10 +2,10 @@ import React from 'react'
 import { createBrowserRouter } from "react-router-dom";
 import App from "./App";
 
-import FixedExpensesPage from "./pages/FixedExpensesPage.jsx"
-import CardsPage from './pages/CardsPage.jsx';
-import IncomePage from './pages/IncomePage.jsx';
-import StatusPage from './pages/StatusPage.jsx';
+import FixedExpensesPage from "./pages/FixedExpensesPage/FixedExpensesPage.jsx"
+import CardsPage from './pages/CardsPage/CardsPage.jsx';
+import IncomePage from './pages/IncomePage/IncomePage.jsx';
+import StatusPage from './pages/StatusPage/StatusPage.jsx';
 
 const router = createBrowserRouter([
 {

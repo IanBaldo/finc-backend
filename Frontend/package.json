@@ -3,6 +3,7 @@
     "bulma": "^0.9.4",
     "css-loader": "^6.7.3",
     "file-loader": "^6.2.0",
+    "material-icons": "^1.13.1",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router": "^6.8.0",

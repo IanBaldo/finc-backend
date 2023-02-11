@@ -1,7 +1,8 @@
 import React from "react";
 
-import Header from './../components/Header/Header.jsx';
-import ExpenseList from '../components/ExpenseList/ExpenseList.jsx'
+import Header from '../../components/Header/Header.jsx';
+import ExpenseList from '../../components/ExpenseList/ExpenseList.jsx'
+import PageContent from "../../components/PageContent/PageContent.jsx";
 
 function IncomePage() {
 
@@ -28,9 +29,9 @@ function IncomePage() {
     return(
         <>
             <Header title="Renda"/>
-            <div>
+            <PageContent>
                 <ExpenseList title="Renda" items={incomeList} removable={true} callback={removeIncome} />
-            </div>
+            </PageContent>
         </>
     );
 }

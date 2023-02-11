@@ -2,6 +2,7 @@ import React from 'react';
 import { Outlet } from "react-router-dom";
 
 import 'bulma/css/bulma.min.css';
+import 'material-icons/iconfont/material-icons.css';
 
 import './App.css'
 import MainTabs from './components/MainTabs/MainTabs.jsx';

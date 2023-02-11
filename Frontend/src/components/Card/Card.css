@@ -1,4 +1,10 @@
-.card {
+.custom-card {
     padding: 1em;
-    margin: 0.5em;
+    width: 65%;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 0.25rem;
+    box-shadow: 0 0.5em 1em -0.125em rgb(10 10 10 / 10%), 0 0 0 1px rgb(10 10 10 / 2%);
+    color: #4a4a4a;
+    margin-bottom: 1.5em;
 }

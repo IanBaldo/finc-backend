@@ -1,7 +1,8 @@
 import React from "react";
 
-import CardList from '../components/CardList/CardList.jsx';
-import Header from './../components/Header/Header.jsx';
+import CardList from '../../components/CardList/CardList.jsx';
+import Header from '../../components/Header/Header.jsx';
+import PageContent from "../../components/PageContent/PageContent.jsx";
 
 function CardsPage() {
     const cards = [
@@ -35,9 +36,9 @@ function CardsPage() {
     return(
         <>
             <Header title="Cartões"/>
-            <div>
+            <PageContent>
                 <CardList cards={cards} />
-            </div>
+            </PageContent>
         </>
     );
 }

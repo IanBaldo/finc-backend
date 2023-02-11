@@ -1,0 +1,21 @@
+.top-row {
+    display: flex;
+}
+
+.top-row > .img {
+    width: 40%;
+}
+
+.top-row > .img > .material-icons {
+    font-size: 3em;
+}
+
+.top-row > .values {
+    width: 60%;
+}
+
+.bottom-row > .month-status {
+    text-align: center;
+    font-weight: 700;
+    font-size: 2em;
+}

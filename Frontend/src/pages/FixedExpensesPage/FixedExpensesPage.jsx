@@ -1,7 +1,8 @@
 import React from 'react';
 
-import Header from './../components/Header/Header.jsx';
-import ExpenseList from './../components/ExpenseList/ExpenseList.jsx';
+import Header from '../../components/Header/Header.jsx';
+import ExpenseList from '../../components/ExpenseList/ExpenseList.jsx';
+import PageContent from '../../components/PageContent/PageContent.jsx';
 
 function FixedExpensesPage() {
   const expenseList = [
@@ -32,9 +33,9 @@ function FixedExpensesPage() {
   return(
     <>
       <Header title="Fixas" endBtn={<a className='button is-link navbar-item' onClick={newFixedExpense}>Adicionar</a>} />
-      <div>
+      <PageContent>
           <ExpenseList title="Despesas Fixas" items={expenseList} removable={true} callback={removeExpense} />
-      </div>
+      </PageContent>
     </>
   );
  }
