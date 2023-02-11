@@ -18,7 +18,7 @@ function ExpenseList (props) {
     return (
         <>
             <div>
-                <ExpenseHeader title={props.title}/>
+                { props.title ? <ExpenseHeader title={props.title}/> : "" }
                 {props.items.map( (expense, index) => {
                     total += expense.value
                     return (

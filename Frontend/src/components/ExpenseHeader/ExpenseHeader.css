@@ -3,4 +3,6 @@
     font-weight: 600;
     border-bottom: solid black;
     max-width: 10em;
+    padding-top: 0.3em;
+    margin-bottom: 0.3em;
 }

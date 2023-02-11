@@ -1,0 +1,14 @@
+.month-bill-header {
+    display: flex;
+    justify-content: space-between;
+    border: 1px solid black;
+    padding: 0.5em;
+    border-radius: 0.5em;
+    margin: 0 auto;
+    width: 60%;
+}
+
+.expense-list {
+    margin: 0 auto;
+    width: 60%;
+}

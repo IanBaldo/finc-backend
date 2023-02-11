@@ -32,7 +32,7 @@ function CardsPage() {
         },
         
     ]
-    
+
     return(
         <>
             <Header title="Cartões"/>
