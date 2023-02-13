@@ -29,17 +29,19 @@ function CardBillDropdown(props) {
 
     return (
         <>
-            <div className="month-bill-header" onClick={toggle}>
-                <div className="month">Mês</div>
-                <div className="bill">R$ 1000,00</div>
-                <div className="icon">
-                    <span className="material-icons">
-                        { open ? 'south' : 'east' }
-                    </span>
+            <div className="month-bill">
+                <div className="month-bill-header" onClick={toggle}>
+                    <div className="month">Mês</div>
+                    <div className="bill">R$ 1000,00</div>
+                    <div className="icon">
+                        <span className="material-icons">
+                            { open ? 'south' : 'east' }
+                        </span>
+                    </div>
                 </div>
-            </div>
-            <div className="expense-list">
-                { open ? <ExpenseList title="Compras" items={expenseList} /> : "" }
+                <div className="expense-list">
+                    { open ? <ExpenseList title="Compras" items={expenseList} /> : "" }
+                </div>
             </div>
         </>
     )
