@@ -1,3 +1,7 @@
 .pages {
     margin-bottom: 3.5em;
 }
+
+.icon-danger {
+    color: red;
+}

@@ -9,7 +9,7 @@ function StatusCard(props) {
             <Card>
                 <div className="top-row">
                     <div className="img">
-                        <span className="material-icons">dangerous_align_right</span>
+                        <span className="material-icons icon-danger">dangerous_align_right</span>
                     </div>
                     <div className="values">
                         Renda R$ 2000,00
