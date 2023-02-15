@@ -22,13 +22,19 @@ function IncomePage() {
 
     ]
 
+    let newIcomeBtn = <a className="button is-link" onClick={newIncome}>Adicionar</a>
+
+    function newIncome() {
+        alert('TO DO')
+    }
+
     function removeIncome(id) {
         alert(`remove income: ${id}`)
     }
     
     return(
         <>
-            <Header title="Renda"/>
+            <Header title="Renda" endBtn={newIcomeBtn} />
             <PageContent>
                 <ExpenseList title="Renda" items={incomeList} removable={true} callback={removeIncome} />
             </PageContent>

@@ -15,7 +15,7 @@ function ExpenseItem (props) {
                 </div>
 
                 <div className="item-extra">
-                    {props.removable ? <a className="button is-ghost is-small" onClick={() => props.callback(props.itemId)}>X</a> : ""}
+                    {props.removable ? <a className="button is-ghost is-small" onClick={() => props.callback(props.itemId)}> <span className="material-icons icon-danger">remove_circle</span> </a> : ""}
                     {props.extra ? props.extra : ""}
                 </div>
             </div>
