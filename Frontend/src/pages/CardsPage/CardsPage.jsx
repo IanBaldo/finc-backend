@@ -33,9 +33,15 @@ function CardsPage() {
         
     ]
 
+    let newCardButton = <a className="button is-link" onClick={newCard}>Adicionar</a>
+
+    function newCard() {
+        alert('TO DO')
+    }
+
     return(
         <>
-            <Header title="Cartões"/>
+            <Header title="Cartões" endBtn={newCardButton} />
             <PageContent>
                 <CardList cards={cards} />
             </PageContent>
