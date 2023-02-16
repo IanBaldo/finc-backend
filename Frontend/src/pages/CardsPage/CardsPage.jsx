@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 
 import CardList from '../../components/CardList/CardList.jsx';
 import Header from '../../components/Header/Header.jsx';
 import PageContent from "../../components/PageContent/PageContent.jsx";
+import Modal from "../../components/Modal/Modal.jsx";
 
 function CardsPage() {
     const cards = [
@@ -34,9 +35,11 @@ function CardsPage() {
     ]
 
     let newCardButton = <a className="button is-link" onClick={newCard}>Adicionar</a>
+    const [ modalState, setModalState ] = useState(false)
+    
 
     function newCard() {
-        alert('TO DO')
+        setModalState(true)
     }
 
     return(
@@ -45,6 +48,8 @@ function CardsPage() {
             <PageContent>
                 <CardList cards={cards} />
             </PageContent>
+
+            <Modal className={modalState ? 'is-active' : ''} />
         </>
     );
 }
