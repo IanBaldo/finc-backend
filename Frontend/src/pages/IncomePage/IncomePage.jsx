@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 
 import Header from '../../components/Header/Header.jsx';
 import ExpenseList from '../../components/ExpenseList/ExpenseList.jsx'
 import PageContent from "../../components/PageContent/PageContent.jsx";
+import Modal from "../../components/Modal/Modal.jsx";
 
 function IncomePage() {
 
@@ -22,12 +23,18 @@ function IncomePage() {
 
     ]
 
-    let newIcomeBtn = <a className="button is-link" onClick={newIncome}>Adicionar</a>
+    let newIcomeBtn = <a className="button is-link" onClick={openNewIncomeModal}>Adicionar</a>
 
-    function newIncome() {
-        alert('TO DO')
+    const [ modalState , setModalState ] = useState('')
+  
+    function openNewIncomeModal() {
+        setModalState('is-active')
     }
 
+    function closeModal() {
+        setModalState('')
+    }
+    
     function removeIncome(id) {
         alert(`remove income: ${id}`)
     }
@@ -38,6 +45,33 @@ function IncomePage() {
             <PageContent>
                 <ExpenseList title="Renda" items={incomeList} removable={true} callback={removeIncome} />
             </PageContent>
+
+            <Modal className={modalState} title="Nova Renda" close={closeModal}>
+                <div className="form">
+                    <div className="form-fields">
+                        <div className="row">
+                        <div className="field">
+                            <label className="label">Nome</label>
+                            <input className="input" />
+                        </div>
+                        <div className="field">
+                            <label className="label">Valor</label>
+                            <input className="input" />
+                        </div>
+                        </div>
+                        <div className="row">
+                        <div className="field">
+                            <label className="label">Data</label>
+                            <input className="input" />
+                        </div>
+                        </div>
+                    </div>
+                    <div className="form-footer">
+                        <button className="button is-link">Adicionar</button>
+                        <button className="button is-ghost" onClick={closeModal}>Cancelar</button>
+                    </div>
+                </div>
+            </Modal>
         </>
     );
 }

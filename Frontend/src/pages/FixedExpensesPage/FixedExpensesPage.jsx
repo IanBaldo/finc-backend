@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 import Header from '../../components/Header/Header.jsx';
 import ExpenseList from '../../components/ExpenseList/ExpenseList.jsx';
 import PageContent from '../../components/PageContent/PageContent.jsx';
+import Modal from '../../components/Modal/Modal.jsx';
 
 function FixedExpensesPage() {
   const expenseList = [
@@ -21,9 +22,15 @@ function FixedExpensesPage() {
       "value": 1000.0
     }
   ]
+
+  const [ modalState , setModalState ] = useState('')
   
-  function newFixedExpense() {
-    alert('TO DO')
+  function openNewFixedExpenseModal() {
+    setModalState('is-active')
+  }
+
+  function closeModal() {
+    setModalState('')
   }
 
   function removeExpense(id) {
@@ -32,10 +39,37 @@ function FixedExpensesPage() {
 
   return(
     <>
-      <Header title="Fixas" endBtn={<a className='button is-link navbar-item' onClick={newFixedExpense}>Adicionar</a>} />
+      <Header title="Fixas" endBtn={<a className='button is-link navbar-item' onClick={openNewFixedExpenseModal}>Adicionar</a>} />
       <PageContent>
-          <ExpenseList title="Despesas Fixas" items={expenseList} removable={true} callback={removeExpense} />
+        <ExpenseList title="Despesas Fixas" items={expenseList} removable={true} callback={removeExpense} />
       </PageContent>
+
+      <Modal className={modalState} title="Nova Despesa Fixa" close={closeModal}>
+        <div className="form">
+          <div className="form-fields">
+            <div className="row">
+              <div className="field">
+                <label className="label">Nome</label>
+                <input className="input" />
+              </div>
+              <div className="field">
+                <label className="label">Valor</label>
+                <input className="input" />
+              </div>
+            </div>
+            <div className="row">
+              <div className="field">
+                <label className="label">Data</label>
+                <input className="input" />
+              </div>
+            </div>
+          </div>
+          <div className="form-footer">
+            <button className="button is-link">Adicionar</button>
+            <button className="button is-ghost" onClick={closeModal}>Cancelar</button>
+          </div>
+        </div>
+      </Modal>
     </>
   );
  }
