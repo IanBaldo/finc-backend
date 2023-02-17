@@ -34,12 +34,16 @@ function CardsPage() {
         
     ]
 
-    let newCardButton = <a className="button is-link" onClick={newCard}>Adicionar</a>
-    const [ modalState, setModalState ] = useState(false)
+    let newCardButton = <a className="button is-link" onClick={openNewCardModal}>Adicionar</a>
+    const [ modalState, setModalState ] = useState('')
     
 
-    function newCard() {
-        setModalState(true)
+    function openNewCardModal() {
+        setModalState('is-active')
+    }
+
+    function closeModal() {
+        setModalState('')
     }
 
     return(
@@ -49,7 +53,7 @@ function CardsPage() {
                 <CardList cards={cards} />
             </PageContent>
 
-            <Modal className={modalState ? 'is-active' : ''} />
+            <Modal className={modalState} close={closeModal}/>
         </>
     );
 }
