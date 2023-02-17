@@ -5,6 +5,8 @@ import Header from '../../components/Header/Header.jsx';
 import PageContent from "../../components/PageContent/PageContent.jsx";
 import Modal from "../../components/Modal/Modal.jsx";
 
+import './CardsPage.css'
+
 function CardsPage() {
     const cards = [
         {
@@ -53,7 +55,36 @@ function CardsPage() {
                 <CardList cards={cards} />
             </PageContent>
 
-            <Modal className={modalState} close={closeModal}/>
+            <Modal className={modalState} title="Adicionar Cartão" close={closeModal}>
+                <div className="form">
+                    <div className="form-fields">
+                        <div className="row">
+                            <div className="field">
+                                <label className="label">Banco</label>
+                                <input className="input" />
+                            </div>
+                            <div className="field">
+                                <label className="label">Nome do Cartão</label>
+                                <input className="input" />
+                            </div>
+                        </div>
+                        <div className="row">
+                            <div className="field">
+                                <label className="label">Fatura</label>
+                                <input className="input" />
+                            </div>
+                            <div className="field">
+                                <label className="label">Limite</label>
+                                <input className="input" />
+                            </div>
+                        </div>
+                    </div>
+                    <div className="form-footer">
+                        <button className="button is-link">Adicionar</button>
+                        <button className="button is-ghost" onClick={closeModal}>Cancelar</button>
+                    </div>
+                </div>
+            </Modal>
         </>
     );
 }

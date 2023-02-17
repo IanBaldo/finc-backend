@@ -1,0 +1,7 @@
+.modal .modal-title {
+    font-size: 1.3em;
+    font-weight: 700;
+    border-bottom: black 1px solid;
+    width: 70%;
+    margin: 0.2em 0 1em 0.4em;
+}
