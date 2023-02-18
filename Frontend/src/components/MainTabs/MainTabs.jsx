@@ -24,10 +24,11 @@ const Tabs = [
 
 function MainTabs() {
     const navigate = useNavigate();
-    const [ activeTab, setActiveTab ] = useState('fix')
+    const [ activeTab, setActiveTab ] = useState(localStorage.getItem('active_tab') || 'status')
     
     function handleClick (tabLink) {
         setActiveTab(tabLink)
+        localStorage.setItem('active_tab', tabLink)
         return navigate(`/${tabLink}`)
     }
 
