@@ -5,20 +5,20 @@ import './MainTabs.css';
 
 const Tabs = [
     {
-        title: "Fixas",
-        link: "fix"
+        title: "Status",
+        link: "status"
     },
     {
         title: "Cartões",
         link: "cards"
     },
     {
-        title: "Renda",
-        link: "income"
+        title: "Fixas",
+        link: "fix"
     },
     {
-        title: "Status",
-        link: "status"
+        title: "Renda",
+        link: "income"
     }
 ]
 
