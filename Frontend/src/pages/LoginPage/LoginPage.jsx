@@ -31,11 +31,11 @@ function LoginPage(props) {
         e.preventDefault()
        
         let response = await requestLogin(formData)
-        console.log(response)
         if (!response)
             alert('Login Falhou!')
 
         props.setToken(response.data.token)
+        localStorage.setItem('token', response.data.token)
         navigate('/status')
     }
 
