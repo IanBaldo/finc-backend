@@ -23,7 +23,7 @@ conn = psycopg2.connect(
 
 @app.after_request
 def after_request(response):
-    response.headers.add("Access-Control-Allow-Origin", "http://localhost:8100")
+    response.headers.add("Access-Control-Allow-Origin", "*")
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
     response.headers['Access-Control-Allow-Methods'] = 'PUT,GET,POST,DELETE'
     return response
@@ -49,6 +49,10 @@ def token_required(f):
     return decorated
 
 ###########  PUBLIC   ###########
+
+@app.route('/', methods=['GET'])
+def hello():
+    return utils.json_response(200, "Success", "Hello")
 
 ### LOGIN
 @app.route('/login', methods=['POST'])
@@ -78,12 +82,23 @@ def login():
     return utils.json_response(200, 'Login OK!', data)
 
 ###########  CARDS  ###########
+@app.route('/banks/list')
+@token_required
+def listBanks():
+    cur = conn.cursor()
+    cur.execute("SELECT * FROM banks")
+    
+    bank_list = cur.fetchall()
+    return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, bank_list))
+
+###########  CARDS  ###########
 @app.route('/cards/list')
 @token_required
 def listCards():
     cur = conn.cursor()
     cur.execute("""
     SELECT 
+        c.id as id,
         c.name as card,
         c.credit_limit::float/100 as limit,
         b.name as bank,
@@ -103,6 +118,7 @@ def listCards():
         ) as e
             on c.id = e.id_card 
     GROUP BY
+        c.id,
         c.name,
         c.credit_limit,
         b.name""", 
@@ -143,7 +159,7 @@ def cardDetails(card_id):
         id,
         name,
         value::float/100 as value,
-        date
+        to_char(date, 'MM-YYYY') as month_year
     FROM expenses
     WHERE
         id_card = %s
@@ -162,8 +178,19 @@ def cardDetails(card_id):
         print (err)
         return utils.json_response(400, 'Something went wrong')
 
-    card_details = cur.fetchall()
-    return utils.json_response(200, "Success", utils.db_data_2_dict(cur.description, card_details))
+    card_expenses = utils.db_data_2_dict(cur.description, cur.fetchall())
+    bills = {}
+    for expense in card_expenses:
+        if not expense["month_year"] in bills:
+            bills[expense["month_year"]] = {
+                "total": 0,
+                "expenses": []
+            }
+
+        bills[expense["month_year"]]["expenses"].append(expense)
+        bills[expense["month_year"]]["total"] += expense["value"]
+        
+    return utils.json_response(200, "Success", bills)
 
 @app.route('/cards/bill/<card_id>', methods=['PUT'])
 @token_required
@@ -492,7 +519,7 @@ def getMonthReport(month_number):
     return utils.json_response(200, 'Report Data OK!', report)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host="0.0.0.0")
 
 
 
