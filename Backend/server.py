@@ -324,7 +324,7 @@ def listFixedExpense():
 @app.route('/expenses/fixed/<expense_id>', methods=['DELETE'])
 @token_required
 def deleteFixedExpense(expense_id):
-    delete_fixed_expense_sql = "DELETE FROM expense WHERE id=%s"
+    delete_fixed_expense_sql = "DELETE FROM expenses WHERE id=%s"
     cur = conn.cursor()
     try:
         cur.execute(delete_fixed_expense_sql, (expense_id,))
@@ -418,7 +418,7 @@ def listMonthIncome(month):
 @token_required
 def removeIncome(income_id):
     
-    delete_income_sql = "DELETE FORM incomes WHERE id=%s"
+    delete_income_sql = "DELETE FROM incomes WHERE id=%s"
     cur = conn.cursor()
     try:
         cur.execute(delete_income_sql, (income_id,))
