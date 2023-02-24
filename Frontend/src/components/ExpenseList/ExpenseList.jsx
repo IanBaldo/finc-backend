@@ -4,23 +4,23 @@ import ExpenseHeader from "../ExpenseHeader/ExpenseHeader.jsx";
 import ExpenseItem from "../ExpenseItem/ExpenseItem.jsx";
 import ExpenseFooter from "../ExpenseFooter/ExpenseFooter.jsx";
 
-function ExpenseList (props) {
+function ExpenseList ({ title, items, removable, callback }) {
     let total = 0
     let extraProp = {}
 
-    if (props.removable) {
+    if (removable) {
         extraProp = {
-            removable : props.removable,
-            callback : props.callback
+            removable : removable,
+            callback : callback
         }
     }
 
     return (
         <>
             <div>
-                { props.title ? <ExpenseHeader title={props.title}/> : "" }
-                {props.items.map( (expense, index) => {
-                    total += expense.value
+                { title ? <ExpenseHeader title={title}/> : "" }
+                { items.map( (expense, index) => {
+                    total += parseFloat(expense.value)
                     return (
                         <ExpenseItem key={index} itemId={expense.id} title={expense.name} value={expense.value} {...extraProp} />
                     )

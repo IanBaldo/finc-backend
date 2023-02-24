@@ -1,44 +1,38 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import CardList from '../../components/CardList/CardList.jsx';
 import Header from '../../components/Header/Header.jsx';
 import PageContent from "../../components/PageContent/PageContent.jsx";
 import Modal from "../../components/Modal/Modal.jsx";
 
+import { getCardList } from '../../services/ApiService.js';
+
 import './CardsPage.css'
+import { useOutletContext } from "react-router";
 
 function CardsPage() {
-    const cards = [
-        {
-            bank: "Bank 1",
-            bill: 1000.0,
-            card: "Card 1",
-            limit: 3000.0
-        },
-        {
-            bank: "Bank 1",
-            bill: 200.0,
-            card: "Card 2",
-            limit: 500.0
-        },
-        {
-            bank: "Bank 2",
-            bill: 1300.0,
-            card: "Card 3",
-            limit: 700.0
-        },
-        {
-            bank: "Bank 3",
-            bill: 400.0,
-            card: "Card 4",
-            limit: 2000.0
-        },
-        
-    ]
-
-    let newCardButton = <a className="button is-link" onClick={openNewCardModal}>Adicionar</a>
+    const [ token, setToken ] = useOutletContext()
+    const [ cardList, setCardList ] = useState([])
     const [ modalState, setModalState ] = useState('')
+    let newCardButton = <a className="button is-link" onClick={openNewCardModal}>Adicionar</a>
     
+
+    useEffect( () => {
+        async function getCards() {
+            // Load Card List
+            let response = await getCardList()
+            if(response.status != 200) {
+                if( response.status == 401 ){
+                    setToken(null)
+                }
+                return
+            }
+
+            setCardList(response.data)
+        }
+
+        getCards()
+    }, [])
 
     function openNewCardModal() {
         setModalState('is-active')
@@ -52,7 +46,7 @@ function CardsPage() {
         <>
             <Header title="Cartões" endBtn={newCardButton} />
             <PageContent>
-                <CardList cards={cards} />
+                <CardList cards={cardList} />
             </PageContent>
 
             <Modal className={modalState} title="Adicionar Cartão" close={closeModal}>

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Outlet } from "react-router-dom";
 
 import 'bulma/css/bulma.min.css';
@@ -11,6 +11,14 @@ import LoginPage from './pages/LoginPage/LoginPage.jsx';
 function App(props) {
   const [ token, setToken ] = useState(localStorage.getItem('token'))
 
+  useEffect( () => {
+    if (!token) {
+      localStorage.removeItem('token')
+      return
+    }
+    localStorage.setItem('token', token)
+  }, [ token ])
+
   if (!token) {
     return (
       <>
@@ -22,7 +30,7 @@ function App(props) {
   return(
    <>
     <div className="pages">
-      <Outlet />
+      <Outlet context={[ token, setToken ]} />
     </div>
     <MainTabs/>
    </>
