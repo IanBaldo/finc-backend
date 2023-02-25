@@ -7,7 +7,7 @@ import ExpenseFooter from "../ExpenseFooter/ExpenseFooter.jsx";
 function ExpenseList ({ title, items, removable, callback }) {
     let total = 0
     let extraProp = {}
-
+    
     if (removable) {
         extraProp = {
             removable : removable,

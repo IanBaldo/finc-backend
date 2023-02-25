@@ -6,6 +6,7 @@ import PageContent from "../../components/PageContent/PageContent.jsx";
 import Modal from "../../components/Modal/Modal.jsx";
 
 import { getCardList } from '../../services/ApiService.js';
+import { cast2array } from '../../services/helpers.js';
 
 import './CardsPage.css'
 import { useOutletContext } from "react-router";
@@ -21,14 +22,17 @@ function CardsPage() {
         async function getCards() {
             // Load Card List
             let response = await getCardList()
-            if(response.status != 200) {
-                if( response.status == 401 ){
+            switch(response.status) {
+                case 200:
+                    setCardList(cast2array(response.data))
+                    break
+                case 401:
                     setToken(null)
-                }
-                return
+                    break
+                default:
+                    console.log(response)
+                    alert(response.message)
             }
-
-            setCardList(response.data)
         }
 
         getCards()

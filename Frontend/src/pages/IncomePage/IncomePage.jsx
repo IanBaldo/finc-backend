@@ -6,6 +6,7 @@ import ExpenseList from '../../components/ExpenseList/ExpenseList.jsx'
 import PageContent from "../../components/PageContent/PageContent.jsx";
 import Modal from "../../components/Modal/Modal.jsx";
 
+import { cast2array } from '../../services/helpers.js';
 import { getIncome, removeIncomeById, addIncome } from '../../services/ApiService.js';
 
 function IncomePage() {
@@ -22,9 +23,10 @@ function IncomePage() {
     useEffect( () => {
         async function getIncomeList() {
             let response = await getIncome()
+            console.log(response)
             switch(response.status) {
                 case 200:
-                    response.data ? setIncomeList(response.data) : ''
+                    setIncomeList(cast2array(response.data))
                     break;
                 case 401:
                     setToken(null)
@@ -44,6 +46,14 @@ function IncomePage() {
 
     function closeModal() {
         setModalState('')
+        clearForm()
+    }
+
+    function clearForm() {
+        newIncomeName.current.value = ''
+        newIncomeValue.current.value = ''
+        newIncomeDate.current.value = ''
+        newIncomeIsRecurrent.current.valu = ''
     }
 
     async function addNewIncome(e) {
@@ -55,6 +65,8 @@ function IncomePage() {
             date: newIncomeDate.current.value,
             is_recurrent: newIncomeIsRecurrent.current.value
         }
+
+        if (!incomeData.name || !incomeData.value ) return
         
         let response = await addIncome(incomeData)
         console.log(response)
@@ -63,10 +75,7 @@ function IncomePage() {
                 // toast?
                 let updatedIncomeList = [ ...incomeList, incomeData]
                 setIncomeList(updatedIncomeList)
-                newIncomeName.current.value = ''
-                newIncomeValue.current.value = ''
-                newIncomeDate.current.value = ''
-                newIncomeIsRecurrent.current.valu = ''
+                clearForm()
                 break
             case 401:
                 setToken(null)
@@ -77,7 +86,6 @@ function IncomePage() {
         }
 
         closeModal()
-        
     }
     
     async function removeIncome(id) {
@@ -130,7 +138,7 @@ function IncomePage() {
                         </div>
                     </div>
                     <div className="form-footer">
-                        <button type="submit" className="button is-link">Adicionar</button>
+                        <button className="button is-link" type='submit'>Adicionar</button>
                         <button className="button is-ghost" onClick={closeModal}>Cancelar</button>
                     </div>
                 </form>

@@ -5,6 +5,7 @@ import ExpenseList from '../../components/ExpenseList/ExpenseList.jsx';
 import PageContent from '../../components/PageContent/PageContent.jsx';
 import Modal from '../../components/Modal/Modal.jsx';
 
+import { cast2array } from '../../services/helpers.js';
 import { getFixedExpenses, addNewFixedExpense, removeFixedExpense } from '../../services/ApiService.js';
 import { useOutletContext } from 'react-router';
 
@@ -20,7 +21,7 @@ function FixedExpensesPage() {
             let response = await getFixedExpenses()
             switch(response.status) {
                 case 200:
-                    response.data ? setExpenseList(response.data) : ''
+                    setExpenseList(cast2array(response.data))
                     break
                 case 401:
                     setToken(null)
