@@ -1,32 +1,42 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useOutletContext, useParams } from "react-router";
 
 import PageContent from "../../components/PageContent/PageContent.jsx";
 import CardBillDropdown from "../../components/CardBillDropdown/CardBillDropdown.jsx";
 import Header from "../../components/Header/Header.jsx";
 import ExpenseList from "../../components/ExpenseList/ExpenseList.jsx";
 
+import { cast2array } from '../../services/helpers.js';
+import { getCardDetails } from '../../services/ApiService.js';
 
 import './CardDetailPage.css';
 
 function CardDetailPage(props) {
+    const [ token, setToken ] = useOutletContext()
     const [ contentDisplay, setContentDisplay ] = useState('bills')
-    const expenseList = [
-        {
-          "date": "Mon, 25 Jul 2022 00:00:00 GMT",
-          "dt_created": "Mon, 25 Jul 2022 00:00:00 GMT",
-          "id": 15,
-          "name": "Netflix",
-          "value": 55.0
-        },
-        {
-          "date": "Mon, 25 Jul 2022 00:00:00 GMT",
-          "dt_created": "Mon, 25 Jul 2022 00:00:00 GMT",
-          "id": 16,
-          "name": "Aluguel",
-          "value": 1000.0
-        }
-    ]
+    const [ bills, setBills ] = useState({})
+    let { id } = useParams()
 
+    useEffect( () => {
+        async function getDetails() {
+            let response = await getCardDetails(id)
+            switch(response.status) {
+                case 200:
+                    let cardBills = response.data ? response.data : {}
+                    setBills(cardBills)
+                    break
+                case 401:
+                    setToken(null)
+                    break
+                default:
+                    console.log(response)
+                    alert(response.message)
+            }
+        }
+
+        getDetails()
+    }, [] )
+    
     function changeContentDisplay(content) {
         setContentDisplay(content)
     }
@@ -50,8 +60,11 @@ function CardDetailPage(props) {
             <PageContent>
                 { contentDisplay == 'bills' ? (
                     <>
-                        <CardBillDropdown />
-                        <CardBillDropdown />
+                        { Object.keys(bills).map( key => {
+                            return (
+                                <CardBillDropdown key={key} dateTitle={key} expenses={bills[key].expenses} total={bills[key].total} />
+                            )
+                        })}
                     </>
                 ) : (
                     <>

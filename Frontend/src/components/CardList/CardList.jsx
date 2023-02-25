@@ -4,19 +4,19 @@ import { useNavigate } from "react-router";
 import Card from '../Card/Card.jsx';
 import CreditCard from './../CreditCard/CreditCard.jsx';
 
-function CardList(props) {
+function CardList({ cards }) {
     const navigate = useNavigate();
 
-    function goToDetails() {
-        navigate('/cards/details')
+    function goToDetails(id) {
+        navigate('/cards/details/'+id)
     }
 
     return (
         <>
-            {props.cards.map((card, index) => {
+            {cards.map((card, index) => {
                 return (
                     <Card key={index}>
-                        <CreditCard key={index} cardName={card.card} value={card.bill} onClick={goToDetails} />
+                        <CreditCard key={index} card={card} onClick={goToDetails} />
                     </Card>
                 )
             })}

@@ -2,7 +2,7 @@ import React from "react";
 
 import './CreditCard.css'
 
-function CreditCard(props) {
+function CreditCard({ card, onClick }) {
 
     function addValue(e) {
         e.stopPropagation()
@@ -26,17 +26,17 @@ function CreditCard(props) {
 
     return (
         <>
-            <div onClick={props.onClick}>
-                <div className="bank-name">
-                    <div className="top-row">
-                        {props.cardName}
+            <div onClick={ () => onClick(card.id)}>
+                <div className="top-row">
+                    <div className="bank-name">
+                        { card.card }
                         <a className="button is-ghost" onClick={promptCardRemoval}>
                             <span className="material-icons icon-danger">delete</span>
                         </a>
                     </div>
                 </div>
                 <div className="value">
-                    R$ {props.value}
+                    R$ { card.bill }
                 </div>
                 <div className="button-group">
                     <button className="button" onClick={changeBill}>Substituir</button>

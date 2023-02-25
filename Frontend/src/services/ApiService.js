@@ -35,6 +35,15 @@ export async function getCardList() {
     })
 }
 
+export async function getCardDetails(id) {
+    return axios.get('/cards/details/'+id)
+        .then( response => {
+            return response.data
+        }, response => {
+             return response.response.data
+    })
+}
+
 export async function getFixedExpenses() {
     return axios.get('/expenses/fixed')
         .then( response => {
