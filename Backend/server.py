@@ -345,6 +345,8 @@ def addIncome():
         print(e)
         return utils.json_response(400, "Data missing!")
 
+    income['is_recurrent'] = income['is_recurrent'] if income['is_recurrent'] else False
+    income['date'] = income['date'] if income['date'] else datetime.datetime.now()
     add_income_sql = "INSERT INTO incomes (name,value,is_recurrent,date,id_user) VALUES (%s,%s,%s,%s,%s)"
     token_data = utils.get_token_data(request, app.config['SECRET_KEY'])
     cur = conn.cursor()
@@ -354,6 +356,7 @@ def addIncome():
         print(e)
         return utils.json_response(400, 'Something went wrong')
 
+    conn.commit()
     return utils.json_response(201, 'Income Added!')
 
 @app.route('/income/list')
@@ -363,7 +366,7 @@ def listIncome():
     SELECT
         id,
         name,
-        value,
+        value::float/100 as value,
         date
     FROM
         incomes
@@ -390,7 +393,7 @@ def listMonthIncome(month):
     SELECT
         id,
         name,
-        value,
+        value::float/100 as value,
         date
     FROM
         incomes
@@ -438,7 +441,7 @@ def getMonthReport(month_number):
     get_month_income_sql = """
         SELECT
             name,
-            value,
+            value::float/100 as value,
             date
         FROM
             incomes
